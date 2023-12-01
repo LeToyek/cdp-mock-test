@@ -5,6 +5,9 @@ const prisma = new PrismaClient();
 const register = async (req, res,next) => {
   const { name, email, password } = req.body;
   // const salt = await bcrypt.genSalt(10);
+  if (password.length < 6) {
+    return res.json({ message: "Password must be atleast 8 characters" });
+  }
   const hash = await bcrypt.hash(password, 10);
   console.log("hash is", hash);
   try {
