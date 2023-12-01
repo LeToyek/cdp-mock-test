@@ -2,7 +2,7 @@ const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
 const prisma = new PrismaClient();
 
-const register = async (req, res,next) => {
+const register = async (req, res, next) => {
   const { name, email, password } = req.body;
   // const salt = await bcrypt.genSalt(10);
   if (password.length < 6) {
@@ -16,9 +16,6 @@ const register = async (req, res,next) => {
         email,
       },
     });
-    console.log("existing user is", existingUser);
-    console.log("user name is", name);
-    console.log("user email is", email);
 
     if (!existingUser) {
       const user = await prisma.user.create({
@@ -28,33 +25,24 @@ const register = async (req, res,next) => {
           password: hash,
         },
       });
-      res.json(user);
+      res.json(
+        {"status": true,
+        "message": "User created successfully",
+        "error": null,
+        "data": user}
+      );
     }
     // return res.redirect('/login')
-    return res.json({ message: "User already exists" });
+    return res
+      .status(400)
+      .json({
+        "status": false,
+        "message": "Bad Request",
+        "error": "User already exists",
+        "data": null
+      });
   } catch (error) {
-    next(error)
-    
-  }
-};
-
-const login = async (req, res) => {
-  const { email, password } = req.body;
-  try {
-    let existingUser = await prisma.user.findUnique({
-      where: {
-        email,
-      },
-    });
-    if (existingUser) {
-      const match = await bcrypt.compare(password, existingUser.password);
-      if (match) {
-        return res.json({ message: "Logged in successfully" });
-      }
-    }
-    return res.json({ message: "Invalid credentials" });
-  } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
@@ -75,11 +63,19 @@ const authUser = async (email, password, done) => {
   } catch (error) {
     console.log(error);
   }
-}
+};
 
+const logOut = (req, res, next) => {
+  req.logout(function (err) {
+    if (err) {
+      return next(err);
+    }
+    res.json({ message: "Logged out successfully" });
+  });
+};
 
 module.exports = {
   register,
-  login,
-  authUser
-}
+  authUser,
+  logOut,
+};
