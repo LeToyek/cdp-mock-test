@@ -37,7 +37,9 @@ app.use(passport.session());
 app.use(flash());
 
 const authRouter = require("./routes/auth.routes");
+const todoRouter = require("./routes/todo.routes");
 app.use(authRouter);
+app.use('/todo',todoRouter);
 
 app.listen(PORT, () => {
   console.log("Listening on port", PORT);

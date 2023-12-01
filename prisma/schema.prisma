@@ -11,33 +11,21 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  todoContainers TodoContainer[]
+  id             String          @id @default(uuid())
+  email          String          @unique
+  name           String
+  password       String
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  todo Todo[]
 }
 
-model TodoContainer{
+model Todo {
   id        String   @id @default(uuid())
   title     String
+  content   String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   userId    String
   user      User     @relation(fields: [userId], references: [id])
-  todoItems TodoItem[]
 }
-
-model TodoItem {
-  id        String   @id @default(uuid())
-  todoContainerId String 
-  todoContainer   TodoContainer @relation(fields: [todoContainerId], references: [id])
-  title     String
-  content   String
-  isDone    Boolean
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
